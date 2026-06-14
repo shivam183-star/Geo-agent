@@ -1,0 +1,11 @@
+feedparser
+requests
+beautifulsoup4
+newspaper3k
+google-generativeai
+sentence-transformers
+scikit-learn
+numpy
+python-dotenv
+schedule
+python-telegram-bot
