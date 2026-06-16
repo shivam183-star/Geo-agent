@@ -1,51 +1,61 @@
-import google.generativeai as genai
+from google import genai
+from dotenv import load_dotenv
 import os
 
-from dotenv import load_dotenv
 
 load_dotenv()
 
-# Configure Gemini
-genai.configure(
+client = genai.Client(
     api_key=os.getenv("GEMINI_API_KEY")
 )
-
-model = genai.GenerativeModel("gemini-1.5-flash")
 
 
 def generate_tweet(title, summary):
 
+    short_summary = summary[:500]
+
     prompt = f"""
-You are a professional geopolitics news account on Twitter/X.
+    Write one short professional geopolitical news tweet.
 
-Your task:
-- Write ONE concise tweet
-- Sound professional and neutral
-- No clickbait
-- No propaganda
-- No emojis
-- Max 280 characters
-- Make it informative and engaging
+    Rules:
+    - Maximum 50 words
+    - Neutral tone
+    - No emojis
+    - No hashtags
+    - No markdown
+    - No intro text
+    - Sound like professional tweet
 
-News Title:
-{title}
+    Title:
+    {title}
 
-News Summary:
-{summary}
-
-Output ONLY the tweet text.
-"""
+    Summary:
+    {summary}
+    """
 
     try:
 
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt
+        )
 
-        tweet = response.text.strip()
+        if response.text:
+            return response.text
 
-        return tweet
+        return None
 
     except Exception as e:
 
         print(f"Gemini Error: {e}")
 
         return None
+    
+
+
+tweet = generate_tweet(
+    "China expands military drills near Taiwan",
+    "China increased naval activity near Taiwan amid rising regional tensions."
+)
+
+print(tweet)

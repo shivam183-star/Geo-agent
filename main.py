@@ -1,9 +1,10 @@
 from news.fetcher import fetch_articles
 from news.scorer import score_article
 from ai.duplicate_checker import is_duplicate
+from ai.tweet_writer import generate_tweet
 
 
-MINIMUM_SCORE = 5
+MINIMUM_SCORE = 8
 
 
 def run_news_pipeline():
@@ -16,7 +17,7 @@ def run_news_pipeline():
 
     important_count = 0
 
-    for i, article in enumerate(articles[:15]):
+    for i, article in enumerate(articles[:5]):
 
         print("=" * 60)
         print(f"Processing Article {i+1}")
@@ -30,12 +31,14 @@ def run_news_pipeline():
         print(f"Score: {score}")
 
         if score >= MINIMUM_SCORE:
-
-            duplicate =  is_duplicate(title, summary)
-
-            if duplicate:
+            if len(summary) < 50:
                 continue
 
+            duplicate = is_duplicate(title, summary)
+
+            if duplicate:
+                print("Skipping duplicate article...\n")
+                continue
 
             important_count += 1
 
@@ -47,7 +50,15 @@ def run_news_pipeline():
             print("\nSummary:")
             print(summary)
 
-            print("\n")
+            tweet = generate_tweet(title, summary)
+
+            if tweet:
+
+                print("\nGenerated Tweet:\n")
+  
+                print(tweet)
+
+                print("\n")
 
     print("=" * 60)
     print(f"\nImportant Articles Found: {important_count}")
